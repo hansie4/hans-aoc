@@ -37,15 +37,17 @@ def getSum2(ds):
     elif "list" in str(type(ds)):
         sum = 0
         for x in ds:
-            sum += getSum(x)
+            sum += getSum2(x)
         return sum
     elif "dict" in str(type(ds)):
         sum = 0
 
-        print(ds.values())
+        if "red" in ds.values():
+            return 0
 
         for x in ds.keys():
-            sum += getSum(ds[x])
+            sum += getSum2(ds[x])
+
         return sum
     else:
         print(type(ds))
