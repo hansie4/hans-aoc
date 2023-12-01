@@ -47,7 +47,7 @@ def replaceValues(k: str, reversed: bool):
 def pt1():
     values = list()
     for x in data:
-        print("Checking ", x)
+        # print("Checking ", x)
 
         v1 = None
         v2 = None
@@ -164,6 +164,6 @@ def pt2():
 
 
 print("Part 1 Answer:")
-# pt1()
+pt1()
 print("Part 2 Answer:")
 pt2()
