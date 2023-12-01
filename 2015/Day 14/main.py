@@ -1,7 +1,7 @@
 import os
 
 script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
-rel_path = "input_test.txt"
+rel_path = "input.txt"
 abs_file_path = os.path.join(script_dir, rel_path)
 
 f = open(abs_file_path, "r")
@@ -19,44 +19,52 @@ def getStats(info):
         stamina = int(t[6])
         restPeriod = int(t[13])
 
-        deers[name] = {
-            "speed": speed,
-            "stamina": stamina,
-            "restPeriod": restPeriod,
-            "cDistance": 0,
-            "cResting": False,
-            "cSpent": 0,
-        }
+        deers[name] = {"speed": speed, "stamina": stamina, "restPeriod": restPeriod}
 
     return deers
+
+
+def simDeer(time: int, speed: int, stamina: int, restPeriod: int):
+    isResting = False
+    distance = 0
+    restingFor = 0
+    runningFor = 0
+    for x in range(time):
+        if isResting:
+            restingFor += 1
+
+            if restingFor == restPeriod:
+                isResting = False
+                restingFor = 0
+        else:
+            distance += speed
+            runningFor += 1
+
+            if runningFor == stamina:
+                isResting = True
+                runningFor = 0
+
+    return distance
 
 
 def pt1():
     deers = getStats(data)
 
-    print(deers)
+    # print(deers)
 
-    secondsToCount = 1000
+    simLength = 2503
 
-    for currentTime in range(secondsToCount):
-        print("Iteration: ", currentTime + 1)
-        for d in deers.keys():
-            deer = deers[d]
+    winner = ("", 0)
 
-            if deer["cResting"]:
-                if deer["cSpent"] == deer["restPeriod"]:
-                    deer["cResting"] = False
-                    deer["cSpent"] = 0
-            else:
-                if deer["cSpent"] == deer["stamina"]:
-                    deer["cResting"] = True
-                    deer["cSpent"] = 0
+    for x in deers.keys():
+        dis = simDeer(
+            simLength, deers[x]["speed"], deers[x]["stamina"], deers[x]["restPeriod"]
+        )
 
-                deer["cDistance"] = deer["cDistance"] + deer["speed"]
+        if dis > winner[1]:
+            winner = (x, dis)
 
-            deer["cSpent"] = deer["cSpent"] + 1
-
-    print(deers)
+    print(winner)
 
 
 def pt2():
