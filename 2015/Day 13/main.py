@@ -9,10 +9,10 @@ f = open(abs_file_path, "r")
 data = f.read().splitlines()
 
 
-def getHappinessLookup():
+def getHappinessLookup(info):
     lookup = dict()
 
-    for x in data:
+    for x in info:
         t = x[:-1].split()
 
         p1 = t[0]
@@ -27,14 +27,76 @@ def getHappinessLookup():
     return lookup
 
 
-def pt1():
-    lookup = getHappinessLookup()
+def getAllNeighborCombos(people: set, currentSeating: list, combos: list):
+    if len(currentSeating) == len(people):
+        combos.append(currentSeating)
 
-    print(lookup)
+    for x in people:
+        newSeating = currentSeating.copy()
+        if x not in newSeating:
+            newSeating.append(x)
+
+            getAllNeighborCombos(people, newSeating, combos)
+
+
+def calculateHappiness(lookup: dict, seating: list):
+    total = 0
+    for x in range(len(seating)):
+        p1 = seating[x]
+        if x == len(seating) - 1:
+            p2 = seating[0]
+        else:
+            p2 = seating[x + 1]
+
+        happiness = lookup[p1][p2] + lookup[p2][p1]
+
+        total += happiness
+
+    return total
+
+
+def pt1():
+    lookup = getHappinessLookup(data)
+
+    # print(lookup)
+
+    combos = list()
+
+    getAllNeighborCombos(lookup.keys(), [], combos)
+
+    for x in combos:
+        x.append(calculateHappiness(lookup, x))
+
+    combos.sort(key=lambda y: y[len(lookup.keys())])
+
+    print(combos[-1])
 
 
 def pt2():
-    pass
+    lookup = getHappinessLookup(data)
+
+    peopleOtherThanMe = set()
+
+    for x in lookup.keys():
+        lookup[x]["Hans"] = 0
+        peopleOtherThanMe.add(x)
+
+    lookup["Hans"] = {}
+    for x in peopleOtherThanMe:
+        lookup["Hans"][x] = 0
+
+    # print(lookup)
+
+    combos = list()
+
+    getAllNeighborCombos(lookup.keys(), [], combos)
+
+    for x in combos:
+        x.append(calculateHappiness(lookup, x))
+
+    combos.sort(key=lambda y: y[len(lookup.keys())])
+
+    print(combos[-1])
 
 
 print("Part 1 Answer:")
