@@ -25,6 +25,7 @@ def getStats(info):
 
 
 def simDeer(time: int, speed: int, stamina: int, restPeriod: int):
+    # Old code no longer needed but used to make improved version
     isResting = False
     distance = 0
     restingFor = 0
@@ -47,28 +48,72 @@ def simDeer(time: int, speed: int, stamina: int, restPeriod: int):
     return distance
 
 
+def simDeers(time: int, deers: dict):
+    deerNames = list(deers.keys())
+    isResting = [False] * len(deerNames)
+    distances = [0] * len(deerNames)
+    restingFor = [0] * len(deerNames)
+    runningFor = [0] * len(deerNames)
+    scores = [0] * len(deerNames)
+
+    for x in range(time):
+        for y in range(len(deerNames)):
+            if isResting[y]:
+                restingFor[y] = restingFor[y] + 1
+
+                if restingFor[y] == deers[deerNames[y]]["restPeriod"]:
+                    isResting[y] = False
+                    restingFor[y] = 0
+            else:
+                distances[y] = distances[y] + deers[deerNames[y]]["speed"]
+                runningFor[y] = runningFor[y] + 1
+
+                if runningFor[y] == deers[deerNames[y]]["stamina"]:
+                    isResting[y] = True
+                    runningFor[y] = 0
+
+        maxDist = max(distances)
+        for y in range(len(distances)):
+            if distances[y] == maxDist:
+                scores[y] = scores[y] + 1
+
+        # print(distances)
+        # print(scores)
+
+    return (max(distances), max(scores))
+
+
+def printDict(d: dict):
+    for x in d:
+        print(x)
+        for y in d[x]:
+            print(y, ":", d[x][y])
+
+        print()
+
+
 def pt1():
-    deers = getStats(data)
-
-    # print(deers)
-
     simLength = 2503
 
-    winner = ("", 0)
+    deers = getStats(data)
 
-    for x in deers.keys():
-        dis = simDeer(
-            simLength, deers[x]["speed"], deers[x]["stamina"], deers[x]["restPeriod"]
-        )
+    # printDict(deers)
 
-        if dis > winner[1]:
-            winner = (x, dis)
+    ans = simDeers(simLength, deers)[0]
 
-    print(winner)
+    print(ans)
 
 
 def pt2():
-    pass
+    simLength = 2503
+
+    deers = getStats(data)
+
+    # printDict(deers)
+
+    ans = simDeers(simLength, deers)[1]
+
+    print(ans)
 
 
 print("Part 1 Answer:")
