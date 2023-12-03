@@ -6,11 +6,58 @@ abs_file_path = os.path.join(script_dir, rel_path)
 
 f = open(abs_file_path, "r")
 
-data = f.read()
+data = f.read().splitlines()
+
+TICKER_TAPE = {
+    "children": 3,
+    "cats": 7,
+    "samoyeds": 2,
+    "pomeranians": 3,
+    "akitas": 0,
+    "vizslas": 0,
+    "goldfish": 5,
+    "trees": 3,
+    "cars": 2,
+    "perfumes": 1,
+}
+
+
+def importSues(info: list):
+    sues = list()
+    for x in info:
+        currentSue = dict()
+
+        t = x.replace(",", "")
+        t = t.split(":", 1)
+        id = t[0]
+        t = t[1].replace(":", "").split()
+
+        currentSue["id"] = id
+
+        for z in range(0, len(t), 2):
+            currentSue[t[z]] = int(t[z + 1])
+
+        sues.append(currentSue)
+
+    return sues
 
 
 def pt1():
-    pass
+    sues = importSues(data)
+
+    # print(sues)
+
+    filteredSues = sues.copy()
+
+    for x in TICKER_TAPE.keys():
+        filteredSues = list(
+            filter(lambda z: x not in z.keys() or z[x] == TICKER_TAPE[x], filteredSues)
+        )
+        # print(filteredSues)
+
+    ans = filteredSues.pop()["id"]
+    print(ans)
+    return ans
 
 
 def pt2():
