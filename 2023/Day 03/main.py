@@ -100,8 +100,19 @@ def getNumberFromIndex(info: list, x: int, y: int):
     return int("".join(tempNumArr))
 
 
+def removeUnneededCords(info: list, cordsToCheck: list, gearX: int, gearY: int):
+    if gearY != len(info) - 1:
+        if info[gearY + 1][gearX - 1].isdigit() or info[gearY + 1][gearX + 1].isdigit():
+            cordsToCheck.remove((0, 1))
+
+    if gearY != 0:
+        if info[gearY - 1][gearX - 1].isdigit() or info[gearY - 1][gearX + 1].isdigit():
+            cordsToCheck.remove((0, -1))
+
+
 def getNumbersNextToGear(info: list, gearX: int, gearY: int):
     cordsToCheck = getCordsToCheck(info, gearX, gearY)
+    removeUnneededCords(info, cordsToCheck, gearX, gearY)
 
     for z in cordsToCheck:
         val = info[gearY + z[1]][gearX + z[0]]
@@ -149,7 +160,7 @@ def pt1():
 def pt2():
     info = data.splitlines()
 
-    print(getNumbersNextToGear(info, 3, 1))
+    print(getNumbersNextToGear(info, 5, 8))
 
 
 print("Part 1 Answer:")
