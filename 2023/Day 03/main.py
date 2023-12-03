@@ -1,7 +1,7 @@
 import os
 
 script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
-rel_path = "input_test.txt"
+rel_path = "input.txt"
 abs_file_path = os.path.join(script_dir, rel_path)
 
 f = open(abs_file_path, "r")
@@ -102,11 +102,35 @@ def getNumberFromIndex(info: list, x: int, y: int):
 
 def removeUnneededCords(info: list, cordsToCheck: list, gearX: int, gearY: int):
     if gearY != len(info) - 1:
-        if info[gearY + 1][gearX - 1].isdigit() or info[gearY + 1][gearX + 1].isdigit():
+        if (
+            info[gearY + 1][gearX - 1].isdigit()
+            and info[gearY + 1][gearX + 0].isdigit()
+            and info[gearY + 1][gearX + 1].isdigit()
+        ):
+            cordsToCheck.remove((0, 1))
+            if gearX != 0:
+                cordsToCheck.remove((-1, 1))
+            else:
+                cordsToCheck.remove((1, 1))
+        elif (
+            info[gearY + 1][gearX - 1].isdigit() or info[gearY + 1][gearX + 1].isdigit()
+        ):
             cordsToCheck.remove((0, 1))
 
     if gearY != 0:
-        if info[gearY - 1][gearX - 1].isdigit() or info[gearY - 1][gearX + 1].isdigit():
+        if (
+            info[gearY - 1][gearX - 1].isdigit()
+            and info[gearY - 1][gearX + 0].isdigit()
+            and info[gearY - 1][gearX + 1].isdigit()
+        ):
+            cordsToCheck.remove((0, -1))
+            if gearX != 0:
+                cordsToCheck.remove((-1, -1))
+            else:
+                cordsToCheck.remove((1, -1))
+        elif (
+            info[gearY - 1][gearX - 1].isdigit() or info[gearY - 1][gearX + 1].isdigit()
+        ):
             cordsToCheck.remove((0, -1))
 
 
@@ -114,10 +138,15 @@ def getNumbersNextToGear(info: list, gearX: int, gearY: int):
     cordsToCheck = getCordsToCheck(info, gearX, gearY)
     removeUnneededCords(info, cordsToCheck, gearX, gearY)
 
+    numbers = list()
+
     for z in cordsToCheck:
         val = info[gearY + z[1]][gearX + z[0]]
         if val.isdigit():
-            print(getNumberFromIndex(info, gearX + z[0], gearY + z[1]))
+            # print(getNumberFromIndex(info, gearX + z[0], gearY + z[1]))
+            numbers.append(getNumberFromIndex(info, gearX + z[0], gearY + z[1]))
+
+    return numbers
 
 
 def pt1():
@@ -160,7 +189,28 @@ def pt1():
 def pt2():
     info = data.splitlines()
 
-    print(getNumbersNextToGear(info, 5, 8))
+    gearCords = list()
+
+    for y in range(len(info)):
+        for x in range(len(info[y])):
+            if info[y][x] == "*":
+                gearCords.append((x, y))
+
+    # print(gearCords)
+
+    ans = 0
+
+    for x in gearCords:
+        nums = getNumbersNextToGear(info, x[0], x[1])
+        # print(nums)
+
+        if len(nums) == 2:
+            gearRatio = nums[0] * nums[1]
+            # print(f"{nums} | {gearRatio}")
+            ans += gearRatio
+
+    print(ans)
+    return ans
 
 
 print("Part 1 Answer:")
