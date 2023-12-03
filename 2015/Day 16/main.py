@@ -42,6 +42,22 @@ def importSues(info: list):
     return sues
 
 
+def filterSue(sue: dict):
+    for x in TICKER_TAPE.keys():
+        if x in sue.keys():
+            if x in ["cats", "trees"]:
+                if sue[x] < TICKER_TAPE[x]:
+                    return False
+            elif x in ["pomeranians", "goldfish"]:
+                if sue[x] > TICKER_TAPE[x]:
+                    return False
+            else:
+                if sue[x] != TICKER_TAPE[x]:
+                    return False
+
+    return True
+
+
 def pt1():
     sues = importSues(data)
 
@@ -61,7 +77,15 @@ def pt1():
 
 
 def pt2():
-    pass
+    sues = importSues(data)
+
+    # print(sues)
+
+    filteredSues = list(filter(filterSue, sues))
+
+    ans = filteredSues.pop()["id"]
+    print(ans)
+    return ans
 
 
 print("Part 1 Answer:")
