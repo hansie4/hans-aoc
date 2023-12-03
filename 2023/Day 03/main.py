@@ -1,7 +1,7 @@
 import os
 
 script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
-rel_path = "input.txt"
+rel_path = "input_test.txt"
 abs_file_path = os.path.join(script_dir, rel_path)
 
 f = open(abs_file_path, "r")
@@ -23,7 +23,7 @@ def getNumbers(info: list):
     return numbers
 
 
-def isNearSymbol(info: list, digitX: int, digitY: int):
+def getCordsToCheck(info: list, digitX: int, digitY: int):
     cordsToCheck = [
         (-1, -1),
         (0, -1),
@@ -62,13 +62,51 @@ def isNearSymbol(info: list, digitX: int, digitY: int):
         if (1, 1) in cordsToCheck:
             cordsToCheck.remove((1, 1))
 
-    # print(cordsToCheck)
+    return cordsToCheck
+
+
+def isNearSymbol(info: list, digitX: int, digitY: int):
+    cordsToCheck = getCordsToCheck(info, digitX, digitY)
 
     for x in cordsToCheck:
         if info[digitY + x[1]][digitX + x[0]] in SYMBOLS:
             return True
 
     return False
+
+
+def getNumberFromIndex(info: list, x: int, y: int):
+    tempNumArr = [""] * len(info[0])
+
+    tempNumArr[x] = info[y][x]
+
+    # Numbers on left
+    if x > 0:
+        for z in range(x - 1, -1, -1):
+            if info[y][z].isdigit():
+                tempNumArr[z] = info[y][z]
+            else:
+                break
+
+    if x < len(info[0]) - 1:
+        for z in range(x + 1, len(info[0])):
+            if info[y][z].isdigit():
+                tempNumArr[z] = info[y][z]
+            else:
+                break
+
+    # print("Y = ", y)
+    # print(tempNumArr)
+    return int("".join(tempNumArr))
+
+
+def getNumbersNextToGear(info: list, gearX: int, gearY: int):
+    cordsToCheck = getCordsToCheck(info, gearX, gearY)
+
+    for z in cordsToCheck:
+        val = info[gearY + z[1]][gearX + z[0]]
+        if val.isdigit():
+            print(getNumberFromIndex(info, gearX + z[0], gearY + z[1]))
 
 
 def pt1():
@@ -109,7 +147,9 @@ def pt1():
 
 
 def pt2():
-    pass
+    info = data.splitlines()
+
+    print(getNumbersNextToGear(info, 3, 1))
 
 
 print("Part 1 Answer:")
