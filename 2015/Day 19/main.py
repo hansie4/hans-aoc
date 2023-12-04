@@ -1,5 +1,6 @@
 import os
 import re
+import math
 
 script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
 rel_path = "input.txt"
@@ -62,8 +63,37 @@ def pt1():
     return len(combos)
 
 
+# Got the answer from https://www.reddit.com/r/adventofcode/comments/3xflz8/comment/cy4etju/ . This was a very hard one.
 def pt2():
-    pass
+    molecule = data[-1].strip()
+
+    l1 = 0
+    l2 = 0
+    l3 = 0
+
+    for z in range(len(molecule)):
+        x = molecule[z]
+        k = x
+
+        if z < len(molecule) - 1:
+            k = "".join([molecule[z], molecule[z + 1]])
+
+        if k == "Rn" or k == "Ar":
+            l2 += 1
+            l1 += 1
+        elif x == "Y":
+            l3 += 1
+            l1 += 1
+        elif x.isupper():
+            l1 += 1
+
+    # print(l1)
+    # print(l2)
+    # print(l3)
+
+    ans = l1 - l2 - (2 * l3) - 1
+
+    print(ans)
 
 
 print("Part 1 Answer:")
