@@ -90,7 +90,7 @@ def processSr(maps: dict, sr: list, granularity: int):
     min = sys.maxsize
     srFrom = None
 
-    print("Reading SR: ", sr)
+    # print("Reading SR: ", sr)
     start = datetime.datetime.now()
     for s in range(sr[0], sr[1] + 1, granularity):
         t = s
@@ -107,8 +107,38 @@ def processSr(maps: dict, sr: list, granularity: int):
     end = datetime.datetime.now()
 
     d = end - start
-    print(f"MIN FOUND: {min} from SR: {srFrom} | TIME TAKEN: {d}")
+    # print(f"MIN FOUND: {min} from SR: {srFrom} | TIME TAKEN: {d}")
     return min, srFrom
+
+
+def getSubRanges(r: tuple, p: int):
+    diff = r[1] - r[0]
+    inc = math.floor(diff / p)
+
+    ranges = []
+
+    for x in range(p * 2):
+        if x == 0:
+            ranges.append(r[0])
+        elif x == (p * 2) - 1:
+            ranges.append(r[1])
+        else:
+            if x % 2 == 0:
+                val = ranges[x - 1] + 1
+                ranges.append(val)
+            else:
+                val = ranges[x - 1] + inc
+                ranges.append(val)
+
+    ranges2 = list()
+
+    for x in range(0, len(ranges), 2):
+        n1 = ranges[x]
+        n2 = ranges[x + 1]
+        ranges2.append((n1, n2))
+
+    # print(ranges2)
+    return ranges2
 
 
 def pt1():
@@ -212,7 +242,50 @@ def pt2():
     print(f"Best Min = {bestMin} from {bestSr} GRANULARITY = {gFactor}")
 
 
+def pt3():
+    seeds, maps = getInputs(data)
+
+    # print(maps)
+
+    seeds = seedsToRanges(seeds)
+
+    # print(seeds)
+
+    for x in maps:
+        maps[x] = processMap(maps[x])
+
+    # print(maps)
+    # print(list(maps.keys()))
+
+    # -------------------------------------------------------------------
+
+    rFactor = 5
+    bFactor = 8
+
+    newSeeds = seeds
+
+    bestMin = sys.maxsize
+    bestSr = None
+
+    for run in range(rFactor):
+        gFactor = int(math.pow(bFactor, ((rFactor - 1) - run)))
+        print(f"Run: {run} with gFactor: {gFactor}")
+
+        for sr in newSeeds:
+            min, x = processSr(maps, sr, gFactor)
+
+            if min < bestMin:
+                bestMin = min
+                bestSr = x
+
+        print(f"Best Min = {bestMin} from {bestSr} GRANULARITY = {gFactor}")
+        newSeeds = getSubRanges(bestSr, bFactor)
+
+    print(bestMin)
+
+
 print("Part 1 Answer:")
 pt1()
 print("Part 2 Answer:")
-pt2()
+# pt2()
+pt3()
