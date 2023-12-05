@@ -267,6 +267,7 @@ def pt3():
     bestMin = sys.maxsize
     bestSr = None
 
+    start = datetime.datetime.now()
     for run in range(rFactor):
         gFactor = int(math.pow(bFactor, ((rFactor - 1) - run)))
         print(f"Run: {run} with gFactor: {gFactor}")
@@ -281,6 +282,8 @@ def pt3():
         print(f"Best Min = {bestMin} from {bestSr} GRANULARITY = {gFactor}")
         newSeeds = getSubRanges(bestSr, bFactor)
 
+    end = datetime.datetime.now()
+    print(f"MIN FOUND: {bestMin} | TIME TAKEN: {end - start}")
     print(bestMin)
 
 
