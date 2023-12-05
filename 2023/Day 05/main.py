@@ -1,8 +1,10 @@
 import os
 import sys
+import datetime
+import math
 
 script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
-rel_path = "input.txt"
+rel_path = "input_test.txt"
 abs_file_path = os.path.join(script_dir, rel_path)
 
 f = open(abs_file_path, "r")
@@ -84,6 +86,28 @@ def seedsToRanges(seeds: list):
     return allSeedRanges
 
 
+def getSeeds(r: tuple, p: int):
+    newSr = []
+
+    start = r[0]
+    end = r[1]
+    diff = end - start
+
+    s = math.ceil(diff / p)
+    r = diff % p
+
+    for x in range(0, p, 1):
+        newSr.append(start + x * s)
+
+        if x == p - 1:
+            newSr.append(r + 1)
+        else:
+            newSr.append(s)
+        # print(newSr)
+
+    return seedsToRanges(newSr)
+
+
 def pt1():
     seeds, maps = getInputs(data)
 
@@ -132,9 +156,17 @@ def pt2():
 
     min = sys.maxsize
 
+    srFrom = None
+
+    # Got from testing. I know the answer is in here
+    goodValue1 = (3164519436, 3728918040)
+
+    seeds1 = getSeeds(goodValue1, 10)
+
     for sr in seeds:
         print("Reading SR: ", sr)
-        for s in range(sr[0], sr[1] + 1):
+        start = datetime.datetime.now()
+        for s in range(sr[0], sr[1] + 1, 100):
             t = s
             # print(s)
             for m in maps:
@@ -144,13 +176,48 @@ def pt2():
 
             if t < min:
                 min = t
+                srFrom = sr
             # print(t)
+        end = datetime.datetime.now()
+
+        d = end - start
+        print("TIME: ", d)
 
     print(min)
+    print(srFrom)
+
+    # sr = (3164519436, 3728918040)
+    # print("Reading SR: ", sr)
+    # start = datetime.datetime.now()
+    # for s in range(sr[0], sr[1] + 1, 100):
+    #     t = s
+    #     # print(s)
+    #     for m in maps:
+    #         t = getDest(maps[m], t)
+    #         # print(m)
+    #         # print(t)
+
+    #     if t < min:
+    #         min = t
+    #         srFrom = sr
+    #     # print(t)
+    # end = datetime.datetime.now()
+
+    # d = end - start
+    # print("TIME: ", d)
+
+    # print(min)
+    # print(srFrom)
+
     return min
 
 
 print("Part 1 Answer:")
 pt1()
 print("Part 2 Answer:")
-pt2()
+# pt2()
+
+seeds, maps = getInputs(data)
+seeds = seedsToRanges(seeds)
+print(seeds)
+print(getSeeds((79, 96), 4))
