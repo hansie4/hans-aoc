@@ -73,20 +73,15 @@ def getDest(m: dict, val: int):
 def seedsToRanges(seeds: list):
     # print(seeds)
 
-    allSeeds = set()
+    allSeedRanges = list()
 
     for x in range(0, len(seeds), 2):
         bottom = seeds[x]
-        top = bottom + seeds[x + 1]
+        top = bottom + seeds[x + 1] - 1
 
-        # print(f"{bottom} - {top}")
-        for y in range(bottom, top):
-            allSeeds.add(y)
+        allSeedRanges.append((bottom, top))
 
-    # print(list(allSeeds))
-    # print(len(allSeeds))
-
-    return allSeeds
+    return allSeedRanges
 
 
 def pt1():
@@ -122,10 +117,12 @@ def pt1():
 def pt2():
     seeds, maps = getInputs(data)
 
-    # print(seeds)
     # print(maps)
 
     seeds = seedsToRanges(seeds)
+
+    print(seeds)
+    print(len(seeds))
 
     for x in maps:
         maps[x] = processMap(maps[x])
@@ -135,17 +132,19 @@ def pt2():
 
     min = sys.maxsize
 
-    for s in seeds:
-        t = s
-        # print(s)
-        for m in maps:
-            t = getDest(maps[m], t)
-            # print(m)
-            # print(t)
+    for sr in seeds:
+        print("Reading SR: ", sr)
+        for s in range(sr[0], sr[1] + 1):
+            t = s
+            # print(s)
+            for m in maps:
+                t = getDest(maps[m], t)
+                # print(m)
+                # print(t)
 
-        if t < min:
-            min = t
-        # print(t)
+            if t < min:
+                min = t
+            # print(t)
 
     print(min)
     return min
