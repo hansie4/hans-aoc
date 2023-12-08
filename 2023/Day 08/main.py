@@ -1,5 +1,6 @@
 import os
 import time
+import math
 
 script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
 rel_path = "input.txt"
@@ -8,6 +9,49 @@ abs_file_path = os.path.join(script_dir, rel_path)
 f = open(abs_file_path, "r")
 
 data = f.read().splitlines()
+
+
+def findInterval(
+    lookup: dict,
+    instructions: list,
+    startLocation: str,
+    endLocations: set,
+    matchFactor: int,
+):
+    currentLocation = startLocation
+    currentInstruction = 0
+
+    moves = 0
+    last = 0
+
+    diff = 0
+
+    lastMatched = 0
+
+    while lastMatched < matchFactor:
+        move = instructions[currentInstruction]
+
+        if move == "L":
+            currentLocation = lookup[currentLocation]["left"]
+        else:
+            currentLocation = lookup[currentLocation]["right"]
+
+        moves += 1
+
+        currentInstruction += 1
+
+        if currentInstruction == len(instructions):
+            currentInstruction = 0
+
+        if currentLocation in endLocations:
+            if moves - last == diff:
+                lastMatched += 1
+
+            diff = moves - last
+            # print(diff)
+            last = moves
+
+    return diff
 
 
 def pt1():
@@ -75,38 +119,24 @@ def pt2():
     # print(ends)
 
     ghostLocations = list(starts)
-    ghostsAtEnd = [False] * len(ghostLocations)
 
-    currentInstruction = 0
-    steps = 0
+    vals = list()
 
-    while not all(ghostsAtEnd):
-        move = instructions[currentInstruction]
+    for x in ghostLocations:
+        i = findInterval(lookup, instructions, x, ends, 1)
+        # print(i)
+        vals.append(i)
 
-        for gi in range(len(ghostLocations)):
-            currentGhostLocation = ghostLocations[gi]
+    # print(vals)
+    ans = math.lcm(*vals)
 
-            if move == "L":
-                ghostLocations[gi] = lookup[currentGhostLocation]["left"]
-            else:
-                ghostLocations[gi] = lookup[currentGhostLocation]["right"]
-
-            ghostsAtEnd[gi] = ghostLocations[gi] in ends
-
-        steps += 1
-        currentInstruction += 1
-
-        if currentInstruction == len(instructions):
-            currentInstruction = 0
-
-        print(ghostsAtEnd)
-
-    print(steps)
+    print(ans)
+    return ans
 
 
 print("Part 1 Answer:")
 start_time = time.time()
-# pt1()
+pt1()
 print(f"It took {time.time() - start_time}s to get answer")
 start_time = time.time()
 print("Part 2 Answer:")
