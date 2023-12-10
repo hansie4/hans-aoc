@@ -2,7 +2,7 @@ import os
 import time
 
 script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
-rel_path = "input_test.txt"
+rel_path = "input.txt"
 abs_file_path = os.path.join(script_dir, rel_path)
 
 f = open(abs_file_path, "r")
@@ -109,7 +109,7 @@ def findLoop(pipeMap: list):
 
     currentPipe = findStart(pipeMap)
 
-    print(f"Starting at {currentPipe}")
+    # print(f"Starting at {currentPipe}")
 
     while True:
         visited.add(currentPipe)
@@ -126,33 +126,11 @@ def findLoop(pipeMap: list):
     return visited
 
 
-def isPointOnInsideOfPipe(pipeMap: list, point: tuple):
-    countToTheLeft = 0
-
-    for x in range(point[0], -1, -1):
-        if (
-            pipeMap[point[1]][x] == "|"
-            or pipeMap[point[1]][x] == "|"
-            or pipeMap[point[1]][x] == "|"
-        ):
-            countToTheLeft += 1
-
-    print("Left: ", countToTheLeft)
-
-    countToTheRight = 0
-
-    for x in range(point[0], len(pipeMap[point[0]]), 1):
-        if pipeMap[point[1]][x] != ".":
-            countToTheRight += 1
-
-    print("Right: ", countToTheRight)
-
-
-def printLoop(loop: set):
-    for y in range(len(data)):
-        for x in range(len(data[y])):
+def printLoop(loop: set, pipeMap: list):
+    for y in range(len(pipeMap)):
+        for x in range(len(pipeMap[y])):
+            char = pipeMap[y][x]
             if (x, y) in loop:
-                char = data[y][x]
                 if char == "-":
                     print("━", end="")
                 elif char == "|":
@@ -168,8 +146,185 @@ def printLoop(loop: set):
                 else:
                     print(char, end="")
             else:
-                print("╳", end="")
+                if char == "*":
+                    print("▉", end="")
+                else:
+                    print("╳", end="")
         print()
+
+
+def removeBadPipes(pipeMap: list, validPipes: set):
+    for y in range(len(pipeMap)):
+        for x in range(len(pipeMap[y])):
+            if (x, y) not in validPipes:
+                pipeMap[y] = pipeMap[y][:x] + "." + pipeMap[y][x + 1 :]
+
+
+def replaceSWith(pipeMap: list):
+    sLoc = findStart(pipeMap)
+
+    nextPipes = getNextPossiblePipes(pipeMap, sLoc, set())
+
+    top = (sLoc[0], sLoc[1] - 1) in nextPipes
+    bottom = (sLoc[0], sLoc[1] + 1) in nextPipes
+    left = (sLoc[0] - 1, sLoc[1]) in nextPipes
+    right = (sLoc[0] + 1, sLoc[1]) in nextPipes
+
+    newVal = ""
+
+    if top and bottom:
+        newVal = "|"
+    elif top and left:
+        newVal = "J"
+    elif top and right:
+        newVal = "L"
+    elif bottom and left:
+        newVal = "7"
+    elif bottom and right:
+        newVal = "F"
+    elif left and right:
+        newVal = "-"
+
+    return newVal
+
+
+def uniqueEdgesLeft(pipeMap: list, point: tuple):
+    uniqueEdges = 0
+
+    lastEdgeStart = None
+
+    for x in range(point[0], -1, -1):
+        v = pipeMap[point[1]][x]
+
+        if v in ["7", "J"]:
+            lastEdgeStart = v
+
+        if v == "L" and lastEdgeStart == "7":
+            # print("A")
+            uniqueEdges += 1
+        elif v == "L" and lastEdgeStart == "J":
+            # print("B")
+            uniqueEdges += 2
+        elif v == "F" and lastEdgeStart == "7":
+            # print("C")
+            uniqueEdges += 2
+        elif v == "F" and lastEdgeStart == "J":
+            # print("D")
+            uniqueEdges += 1
+        elif v == "|":
+            # print("E")
+            uniqueEdges += 1
+
+    return uniqueEdges
+
+
+def uniqueEdgesRight(pipeMap: list, point: tuple):
+    uniqueEdges = 0
+
+    lastEdgeStart = None
+
+    for x in range(point[0], len(pipeMap[point[1]]), 1):
+        v = pipeMap[point[1]][x]
+
+        if v in ["L", "F"]:
+            lastEdgeStart = v
+
+        if v == "7" and lastEdgeStart == "L":
+            # print("A")
+            uniqueEdges += 1
+        elif v == "7" and lastEdgeStart == "F":
+            # print("B")
+            uniqueEdges += 2
+        elif v == "J" and lastEdgeStart == "L":
+            # print("C")
+            uniqueEdges += 2
+        elif v == "J" and lastEdgeStart == "F":
+            # print("D")
+            uniqueEdges += 1
+        elif v == "|":
+            # print("E")
+            uniqueEdges += 1
+
+    return uniqueEdges
+
+
+def uniqueEdgesTop(pipeMap: list, point: tuple):
+    uniqueEdges = 0
+
+    lastEdgeStart = None
+
+    for y in range(point[1], -1, -1):
+        v = pipeMap[y][point[0]]
+
+        if v in ["L", "J"]:
+            lastEdgeStart = v
+
+        if v == "7" and lastEdgeStart == "L":
+            # print("A")
+            uniqueEdges += 1
+        elif v == "7" and lastEdgeStart == "J":
+            # print("B")
+            uniqueEdges += 2
+        elif v == "F" and lastEdgeStart == "L":
+            # print("C")
+            uniqueEdges += 2
+        elif v == "F" and lastEdgeStart == "J":
+            # print("D")
+            uniqueEdges += 1
+        elif v == "-":
+            # print("E")
+            uniqueEdges += 1
+
+    return uniqueEdges
+
+
+def uniqueEdgesBottom(pipeMap: list, point: tuple):
+    uniqueEdges = 0
+
+    lastEdgeStart = None
+
+    for y in range(point[1], len(pipeMap), 1):
+        v = pipeMap[y][point[0]]
+
+        if v in ["7", "F"]:
+            lastEdgeStart = v
+
+        if v == "L" and lastEdgeStart == "7":
+            # print("A")
+            uniqueEdges += 1
+        elif v == "L" and lastEdgeStart == "F":
+            # print("B")
+            uniqueEdges += 2
+        elif v == "J" and lastEdgeStart == "7":
+            # print("C")
+            uniqueEdges += 2
+        elif v == "J" and lastEdgeStart == "F":
+            # print("D")
+            uniqueEdges += 1
+        elif v == "-":
+            # print("E")
+            uniqueEdges += 1
+
+    return uniqueEdges
+
+
+def isPointOnInsideOfPipe(pipeMap: list, point: tuple):
+    left = uniqueEdgesLeft(pipeMap, point)
+    right = uniqueEdgesRight(pipeMap, point)
+    top = uniqueEdgesTop(pipeMap, point)
+    bottom = uniqueEdgesBottom(pipeMap, point)
+
+    # print(left)
+    # print(right)
+    # print(top)
+    # print(bottom)
+
+    if left == 0 or right == 0 or top == 0 or bottom == 0:
+        return False
+
+    m = min([top, bottom, left, right])
+
+    return not m % 2 == 0
 
 
 def pt1():
@@ -184,9 +339,32 @@ def pt1():
 def pt2():
     loop = findLoop(data)
 
-    printLoop(loop)
+    # printLoop(loop, data)
+    # print()
 
-    isPointOnInsideOfPipe(data, (3, 2))
+    ans = 0
+
+    z = replaceSWith(data)
+    for x in range(len(data)):
+        data[x] = data[x].replace("S", z)
+
+    removeBadPipes(data, loop)
+
+    # printLoop(loop, data)
+
+    for y in range(len(data)):
+        for x in range(len(data[y])):
+            tup = (x, y)
+            if tup not in loop:
+                # print(f"{tup} | {isInLoop}")
+
+                isInLoop = isPointOnInsideOfPipe(data, tup)
+
+                if isInLoop:
+                    # print(f"{tup} | {isInLoop}")
+                    ans += 1
+
+    print(ans)
 
 
 print("Part 1 Answer:")
