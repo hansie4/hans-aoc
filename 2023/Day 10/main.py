@@ -2,7 +2,7 @@ import os
 import time
 
 script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
-rel_path = "input.txt"
+rel_path = "input_test.txt"
 abs_file_path = os.path.join(script_dir, rel_path)
 
 f = open(abs_file_path, "r")
@@ -126,16 +126,54 @@ def findLoop(pipeMap: list):
     return visited
 
 
+def isPointOnInsideOfPipe(pipeMap: list, point: tuple):
+    countToTheLeft = 0
+
+    for x in range(point[0], -1, -1):
+        if (
+            pipeMap[point[1]][x] == "|"
+            or pipeMap[point[1]][x] == "|"
+            or pipeMap[point[1]][x] == "|"
+        ):
+            countToTheLeft += 1
+
+    print("Left: ", countToTheLeft)
+
+    countToTheRight = 0
+
+    for x in range(point[0], len(pipeMap[point[0]]), 1):
+        if pipeMap[point[1]][x] != ".":
+            countToTheRight += 1
+
+    print("Right: ", countToTheRight)
+
+
+def printLoop(loop: set):
+    for y in range(len(data)):
+        for x in range(len(data[y])):
+            if (x, y) in loop:
+                char = data[y][x]
+                if char == "-":
+                    print("━", end="")
+                elif char == "|":
+                    print("┃", end="")
+                elif char == "J":
+                    print("┛", end="")
+                elif char == "7":
+                    print("┓", end="")
+                elif char == "L":
+                    print("┗", end="")
+                elif char == "F":
+                    print("┏", end="")
+                else:
+                    print(char, end="")
+            else:
+                print("╳", end="")
+        print()
+
+
 def pt1():
     loop = findLoop(data)
-
-    # for y in range(len(data)):
-    #     for x in range(len(data[y])):
-    #         if (x, y) in loop:
-    #             print(data[y][x], end="")
-    #         else:
-    #             print("", end="")
-    #     print()
 
     ans = int(len(loop) / 2)
 
@@ -144,7 +182,11 @@ def pt1():
 
 
 def pt2():
-    pass
+    loop = findLoop(data)
+
+    printLoop(loop)
+
+    isPointOnInsideOfPipe(data, (3, 2))
 
 
 print("Part 1 Answer:")
