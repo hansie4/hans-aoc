@@ -37,23 +37,69 @@ def getNextPossiblePipes(pipeMap: list, currentPipe: tuple, alreadyVisited: set)
     nextPipes = list()
 
     cp = pipeMap[currentPipe[1]][currentPipe[0]]
-    print(cp)
+
+    instructionsToExecute = set()
+    # 1 = Top
+    # 2 = Bottom
+    # 3 = Left
+    # 4 = Right
 
     if cp == "S":
-        pass
+        instructionsToExecute.add(1)
+        instructionsToExecute.add(2)
+        instructionsToExecute.add(3)
+        instructionsToExecute.add(4)
+    elif cp == "7":
+        instructionsToExecute.add(2)
+        instructionsToExecute.add(3)
+    elif cp == "J":
+        instructionsToExecute.add(1)
+        instructionsToExecute.add(3)
     elif cp == "L":
-        pass
+        instructionsToExecute.add(1)
+        instructionsToExecute.add(4)
     elif cp == "F":
-        pass
+        instructionsToExecute.add(2)
+        instructionsToExecute.add(4)
     elif cp == "|":
-        pass
+        instructionsToExecute.add(1)
+        instructionsToExecute.add(2)
     elif cp == "-":
+        instructionsToExecute.add(3)
+        instructionsToExecute.add(4)
+
+    if 1 in instructionsToExecute:
+        # Top pipe
+        if currentPipe[1] != 0:
+            nextPipeCords = (currentPipe[0], currentPipe[1] - 1)
+            if nextPipeCords not in alreadyVisited:
+                nextPipeType = pipeMap[nextPipeCords[1]][nextPipeCords[0]]
+                if canConnectFromBottom(nextPipeType):
+                    nextPipes.append(nextPipeCords)
+    if 2 in instructionsToExecute:
+        # Bottom pipe
+        if currentPipe[1] != len(pipeMap) - 1:
+            nextPipeCords = (currentPipe[0], currentPipe[1] + 1)
+            if nextPipeCords not in alreadyVisited:
+                nextPipeType = pipeMap[nextPipeCords[1]][nextPipeCords[0]]
+                if canConnectFromTop(nextPipeType):
+                    nextPipes.append(nextPipeCords)
+    if 3 in instructionsToExecute:
         # Left pipe
         if currentPipe[0] != 0:
             nextPipeCords = (currentPipe[0] - 1, currentPipe[1])
-            nextPipeType = pipeMap[nextPipeCords[1]][nextPipeCords[0]]
-            if doPipesConnect(cp, pipeMap[currentPipe[1]][currentPipe[0] - 1]):
-                nextPipes.append((currentPipe[0] - 1, currentPipe[1]))
+            if nextPipeCords not in alreadyVisited:
+                nextPipeType = pipeMap[nextPipeCords[1]][nextPipeCords[0]]
+                if canConnectFromRight(nextPipeType):
+                    nextPipes.append(nextPipeCords)
+    if 4 in instructionsToExecute:
+        # Right pipe
+        if currentPipe[0] != len(pipeMap[currentPipe[1]]) - 1:
+            nextPipeCords = (currentPipe[0] + 1, currentPipe[1])
+            if nextPipeCords not in alreadyVisited:
+                nextPipeType = pipeMap[nextPipeCords[1]][nextPipeCords[0]]
+                if canConnectFromLeft(nextPipeType):
+                    nextPipes.append(nextPipeCords)
 
     return nextPipes
 
@@ -61,13 +107,40 @@ def getNextPossiblePipes(pipeMap: list, currentPipe: tuple, alreadyVisited: set)
 def findLoop(pipeMap: list):
     visited = set()
 
-    start = findStart(pipeMap)
+    currentPipe = findStart(pipeMap)
 
-    getNextPossiblePipe(pipeMap, start, visited)
+    print(f"Starting at {currentPipe}")
+
+    while True:
+        visited.add(currentPipe)
+
+        nextPipes = getNextPossiblePipes(pipeMap, currentPipe, visited)
+
+        # print(nextPipes)
+
+        if len(nextPipes) == 0:
+            break
+
+        currentPipe = nextPipes[0]
+
+    return visited
 
 
 def pt1():
     loop = findLoop(data)
+
+    # for y in range(len(data)):
+    #     for x in range(len(data[y])):
+    #         if (x, y) in loop:
+    #             print(data[y][x], end="")
+    #         else:
+    #             print("", end="")
+    #     print()
+
+    ans = int(len(loop) / 2)
+
+    print(ans)
+    return ans
 
 
 def pt2():
