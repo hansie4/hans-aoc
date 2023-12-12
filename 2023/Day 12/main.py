@@ -141,55 +141,7 @@ def pt1():
 
 
 def pt2():
-    mappedInput = mapInput(data)
-
-    # mappedInput = transformInput(5, mappedInput)
-
-    print(len(mappedInput))
-
-    test = mappedInput[0]
-
-    s = test[0]
-    r = test[1]
-
-    s = ".?????...??.??"
-    r = [3, 2, 1]
-
-    print(s)
-    print(r)
-    print()
-    s = seperateStringOnPeriods(s)
-    print(s)
-
-    tests = [[]] * len(r)
-
-    r = sublists(r)
-
-    for zI in range(len(s)):
-        z = s[zI]
-
-        minimum = z.count("#")
-        maximum = len(z)
-
-        possibilities = list()
-
-        if minimum != 0:
-            possibilities.append([])
-
-        for x in range(len(r)):
-            sL = r[x]
-            sM = sum(sL)
-
-            if sM + (len(sL) - 1) <= maximum:
-                possibilities.append(sL)
-
-        # print(possibilities)
-        tests[zI] = possibilities
-
-    # print(tests)
-    for x in range(len(tests)):
-        print(possibilitiesToString(s[x], tests[x]))
-        print()
+    pass
 
 
 print("Part 1 Answer:")
