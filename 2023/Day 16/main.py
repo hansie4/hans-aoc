@@ -58,6 +58,7 @@ def getEnergizedSquares(start: tuple):
 
         for n in cn:
             seen.add(n)
+            energized.add((n[0], n[1]))
             currentDir = n[2]
             if currentDir == "U":
                 nextNode = [n[0], n[1] - 1, n[2]]
@@ -112,8 +113,6 @@ def getEnergizedSquares(start: tuple):
                         nextNodes.append((nextNode[0], nextNode[1], d))
                 else:
                     print("THIS SHOULD NEVER HAPPEN 3")
-
-                # currentNodes.remove(n)
 
                 if len(nextNodes) > 0:
                     for z in nextNodes:
@@ -175,6 +174,6 @@ print(f"It took {time.time() - start_time}s to get answer")
 start_time = time.time()
 print()
 print("Part 2 Answer:")
-print(Fore.GREEN + str(pt2()))
+# print(Fore.GREEN + str(pt2()))
 print(Style.RESET_ALL, end="")
 print(f"It took {time.time() - start_time}s to get answer")
