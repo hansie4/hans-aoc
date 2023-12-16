@@ -46,6 +46,7 @@ def getEnergizedSquares(start: tuple):
     energized = set()
 
     seen = set()
+    sz = set()
     energized.add((start[0], start[1]))
 
     while True:
@@ -141,8 +142,7 @@ def getEnergizedSquares(start: tuple):
         # input()
 
     ans = len(energized)
-
-    # print(ans)
+    print(f"SEEN {len(sz)}")
     return ans
 
 
@@ -170,12 +170,12 @@ def pt2():
 
 print("Part 1 Answer:")
 start_time = time.time()
-print(Fore.CYAN + str(pt1()))
+print(Fore.GREEN + str(pt1()))
 print(Style.RESET_ALL)
 print(f"It took {time.time() - start_time}s to get answer")
 start_time = time.time()
 print()
 print("Part 2 Answer:")
-print(Fore.CYAN + str(pt2()))
+print(Fore.GREEN + str(pt2()))
 print(Style.RESET_ALL)
 print(f"It took {time.time() - start_time}s to get answer")
