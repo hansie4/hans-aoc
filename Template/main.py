@@ -1,5 +1,6 @@
 import os
 import time
+from colorama import Fore, Style
 
 script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
 rel_path = "input.txt"
@@ -20,9 +21,12 @@ def pt2():
 
 print("Part 1 Answer:")
 start_time = time.time()
-pt1()
+print(Fore.CYAN + str(pt1()))
+print(Style.RESET_ALL)
 print(f"It took {time.time() - start_time}s to get answer")
 start_time = time.time()
+print()
 print("Part 2 Answer:")
-pt2()
+print(Fore.CYAN + str(pt2()))
+print(Style.RESET_ALL)
 print(f"It took {time.time() - start_time}s to get answer")
