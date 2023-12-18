@@ -1,7 +1,8 @@
 import os
 import time
 from colorama import Fore, Style
-import sys
+import numpy
+import math
 
 script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
 rel_path = "input.txt"
@@ -149,6 +150,41 @@ def floodFillNonRecursive(grid: list, x: int, y: int):
                 spacesToFill.add((n[0], n[1]))
 
 
+def getPt2Points():
+    points = list()
+    perimeter = 0
+
+    currentPoint = (0, 0)
+
+    for l in data:
+        h = l.split()[2][2:-1]
+        distInHex = h[:-1]
+        directionCode = h[-1]
+
+        distance = int(distInHex, base=16)
+
+        perimeter += distance
+
+        if directionCode == "0":
+            # Right
+            nextPoint = (currentPoint[0] + distance, currentPoint[1])
+        elif directionCode == "1":
+            # Down
+            nextPoint = (currentPoint[0], currentPoint[1] + distance)
+        elif directionCode == "2":
+            # Left
+            nextPoint = (currentPoint[0] - distance, currentPoint[1])
+        else:
+            # Up
+            nextPoint = (currentPoint[0], currentPoint[1] - distance)
+
+        points.append(nextPoint)
+
+        currentPoint = nextPoint
+
+    return points, perimeter
+
+
 def pt1():
     trenchPoints = createDataGrid()
 
@@ -157,6 +193,7 @@ def pt1():
     # for x in grid:
     #     print("".join(x))
 
+    # Got the points by looking at the grid
     floodFillNonRecursive(grid, 100, 200)
 
     # for x in grid:
@@ -173,7 +210,31 @@ def pt1():
 
 
 def pt2():
-    pass
+    points, perimeter = getPt2Points()
+
+    # print(perimeter)
+    # print(len(points))
+
+    total = 0
+
+    for x in range(len(points)):
+        currentPoint = points[x]
+        if x == len(points) - 1:
+            nextPoint = points[0]
+        else:
+            nextPoint = points[x + 1]
+
+        arr = [currentPoint, nextPoint]
+
+        det = numpy.linalg.det(arr)
+
+        total += det
+
+    h = int(math.ceil(total / 2))
+    j = int(math.ceil(perimeter / 2))
+    k = h + j + 1
+
+    return k
 
 
 print("Part 1 Answer:")
