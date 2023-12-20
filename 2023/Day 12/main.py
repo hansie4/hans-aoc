@@ -1,6 +1,8 @@
 import os
 import time
 import itertools
+import re
+from cachetools import cached, TTLCache
 
 script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
 rel_path = "input.txt"
@@ -9,6 +11,9 @@ abs_file_path = os.path.join(script_dir, rel_path)
 f = open(abs_file_path, "r")
 
 data = f.read().splitlines()
+
+
+globalCache = dict()
 
 
 def replaceIndex(originalString: str, index: int, newValue: str):
@@ -119,12 +124,49 @@ def transformInput(factor: int, originalInput: list):
     newInput = list()
 
     for x in originalInput:
-        n1 = (x[0] + "?") * factor
+        n1 = "?".join([x[0]] * factor)
         n2 = x[1] * factor
 
-        newInput.append((n1[:-1], n2))
+        newInput.append((n1, n2))
 
     return newInput
+
+
+def countAllPossibleValidWays(springMap: str, springGroups: list):
+    if springMap == "":
+        return 1 if len(springGroups) == 0 else 0
+    elif len(springGroups) == 0:
+        return 0 if "#" in springMap else 1
+    else:
+        if (springMap, tuple(springGroups)) in globalCache:
+            return globalCache[(springMap, tuple(springGroups))]
+
+        count = 0
+
+        firstChar = springMap[0]
+
+        if firstChar == "." or firstChar == "?":
+            count += countAllPossibleValidWays(springMap[1:], springGroups)
+
+        if firstChar == "#" or firstChar == "?":
+            restOfSpringsCanFit = springGroups[0] <= len(springMap)
+            nextGroupOfSpringSplitUp = "." in springMap[: springGroups[0]]
+
+            if (
+                restOfSpringsCanFit
+                and not nextGroupOfSpringSplitUp
+                and (
+                    springGroups[0] == len(springMap)
+                    or springMap[springGroups[0]] != "#"
+                )
+            ):
+                count += countAllPossibleValidWays(
+                    springMap[springGroups[0] + 1 :], springGroups[1:]
+                )
+
+        globalCache[(springMap, tuple(springGroups))] = count
+
+        return count
 
 
 def pt1():
@@ -141,7 +183,18 @@ def pt1():
 
 
 def pt2():
-    pass
+    mappedInput = transformInput(5, mapInput(data))
+
+    ans = 0
+
+    for x in mappedInput:
+        # print(x)
+        c = countAllPossibleValidWays(x[0], x[1])
+        ans += c
+
+    print(ans)
+
+    return ans
 
 
 print("Part 1 Answer:")
@@ -150,5 +203,5 @@ pt1()
 print(f"It took {time.time() - start_time}s to get answer")
 start_time = time.time()
 print("Part 2 Answer:")
-# pt2()
+pt2()
 print(f"It took {time.time() - start_time}s to get answer")
