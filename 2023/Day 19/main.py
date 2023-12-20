@@ -10,6 +10,8 @@ f = open(abs_file_path, "r")
 
 data = f.read().splitlines()
 
+ruleSet = []
+
 
 def getInput():
     workflows = dict()
@@ -97,6 +99,54 @@ def processRating(workflows, rating, startWorkflow):
                     return processRating(workflows, rating, possibleNextWorkflow)
 
 
+def getWorkflowCount(workflowMap: dict, currentState: str, ranges: dict):
+    # x, m, a, s = [z - y + 1 for y, z in ranges.values()]
+    # print(f"{currentState} | {x * m * a * s}")
+    if currentState == "A":
+        x, m, a, s = [z - y + 1 for y, z in ranges.values()]
+        return x * m * a * s
+    elif currentState == "R":
+        return 0
+    else:
+        rulesForState = workflowMap[currentState]
+
+        totalCounts = 0
+
+        currentRanges = ranges.copy()
+
+        for rule in rulesForState:
+            if len(rule) == 1:
+                totalCounts += getWorkflowCount(workflowMap, rule[0], currentRanges)
+            else:
+                rangeTuple = currentRanges[rule[0]]
+
+                rangesForTrue = currentRanges.copy()
+                if rule[1] == "<":
+                    rangesForTrue[rule[0]] = (
+                        rangeTuple[0],
+                        min(rangeTuple[1], rule[2]) - 1,
+                    )
+                    currentRanges[rule[0]] = (
+                        max(rangeTuple[0], rule[2]),
+                        rangeTuple[1],
+                    )
+                else:
+                    rangesForTrue[rule[0]] = (
+                        max(rangeTuple[0], rule[2]) + 1,
+                        rangeTuple[1],
+                    )
+                    currentRanges[rule[0]] = (
+                        rangeTuple[0],
+                        min(rangeTuple[1], rule[2]),
+                    )
+
+                countForTrue = getWorkflowCount(workflowMap, rule[3], rangesForTrue)
+
+                totalCounts += countForTrue
+
+        return totalCounts
+
+
 def pt1():
     workflows, ratings = getInput()
 
@@ -110,7 +160,20 @@ def pt1():
 
 
 def pt2():
-    pass
+    workflows, _ = getInput()
+
+    ans = getWorkflowCount(
+        workflows,
+        "in",
+        {
+            "x": (1, 4000),
+            "m": (1, 4000),
+            "a": (1, 4000),
+            "s": (1, 4000),
+        },
+    )
+
+    return ans
 
 
 print("Part 1 Answer:")
