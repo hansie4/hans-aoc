@@ -1,6 +1,9 @@
 import os
 import time
-from colorama import Fore, Style
+from colorama import Style, Fore
+import math
+
+# from colorama import Fore, Style
 from collections import deque
 
 script_dir = os.path.dirname(__file__)  # <-- absolute dir the script is in
@@ -54,7 +57,7 @@ def getCunjunctionMap(modules: dict):
     return conjunctionMap
 
 
-def countPulses(modules: dict, cunjunctionMap: dict, currentState: dict):
+def countPulses(modules: dict, cunjunctionMap: dict, currentState: dict, count=0):
     queue = deque([("button", 0, "broadcaster")])
 
     lowPulseCount = 0
@@ -95,6 +98,9 @@ def countPulses(modules: dict, cunjunctionMap: dict, currentState: dict):
 
                 if len(cunjunctionMap[to].keys()) == sum(cunjunctionMap[to].values()):
                     for z in modules[to]["locations"]:
+                        # if z in ["cl", "tn", "bm", "dr"]:
+                        if z in ["dr"]:
+                            print(f"{z}: ", count)
                         queue.append((to, 0, z))
                 else:
                     for z in modules[to]["locations"]:
@@ -135,7 +141,33 @@ def pt1():
 
 
 def pt2():
-    pass
+    # modules = readInModules()
+
+    # conMap = getCunjunctionMap(modules)
+
+    # # for x in modules:
+    # #     print(f"{x} | {modules[x]}")
+
+    # currentState = dict()
+    # for x in modules:
+    #     if modules[x]["type"] == "%":
+    #         currentState[x] = False
+
+    # for z in conMap:
+    #     print(f"{z}|", end="")
+    # print()
+
+    # # did this with prints in countPulses on certain modules
+    # for x in range(100000000):
+    #     countPulses(modules, conMap, currentState, x)
+
+    # Cycles
+    # tn = 3761
+    # cl = 3943
+    # bm = 3889
+    # dr = 3821
+
+    return math.lcm(3761, 3943, 3889, 3821)
 
 
 print("Part 1 Answer:")
