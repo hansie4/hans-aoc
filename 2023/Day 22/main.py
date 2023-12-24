@@ -195,18 +195,35 @@ def getSupports(grid: list):
     return supports
 
 
-def whatBlocksBreakByRemovingBlock(blockToRemove: int, supports: dict):
+def whatBlocksBreakByRemovingBlock(blockToRemove: int, supports: dict, removed: set()):
     blockIsSupporting = supports[blockToRemove]
 
     blocksOthersSupport = set()
 
     for s in supports:
-        if s != blockToRemove:
+        if s != blockToRemove and s not in removed:
             for p in supports[s]:
                 if p in blockIsSupporting:
                     blocksOthersSupport.add(p)
 
     return blockIsSupporting.difference(blocksOthersSupport)
+
+
+def getChainReactionDamage(blockToRemove: int, supports: dict, removed: set):
+    z = whatBlocksBreakByRemovingBlock(blockToRemove, supports, removed)
+
+    if len(z) == 0:
+        return 0
+
+    count = 0
+
+    removed.add(blockToRemove)
+
+    for b in z:
+        count += getChainReactionDamage(b, supports, removed)
+        removed.add(b)
+
+    return len(z) + count
 
 
 def pt1():
@@ -226,27 +243,32 @@ def pt1():
     z = 0
 
     for x in supports:
-        # print(f"{x} | {supports[x]}")
-        if len(supports[x]) == 0:
+        a = whatBlocksBreakByRemovingBlock(x, supports, {})
+        if len(a) == 0:
             z += 1
-        else:
-            a = supports[x]
-            b = set()
-
-            for j in supports:
-                if j != x:
-                    for p in supports[j]:
-                        if p in a:
-                            b.add(p)
-
-            if a == b:
-                z += 1
 
     return z
 
 
 def pt2():
-    pass
+    blocks = readInBlocks()
+    grid = blocksToGrid(blocks)
+
+    settleBlocks(grid)
+
+    supports = getSupports(grid)
+
+    z = 0
+
+    for b in supports.keys():
+        r = set()
+        a = getChainReactionDamage(b, supports, r)
+
+        # print(f"{b} -> {a}")
+
+        z += a
+
+    return z
 
 
 print("Part 1 Answer:")
