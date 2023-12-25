@@ -85,11 +85,102 @@ def getMaxDist(grid: list, start: tuple):
     return dist
 
 
+def getSplits(nodes: set, start: tuple, end: tuple):
+    splits = list()
+
+    currentSplit = list()
+
+    neighborsDict = dict()
+    splitPoints = set()
+
+    for node in nodes:
+        neighbors = set()
+        for dir in [(-1, 0), (1, 0), (0, -1), (0, 1)]:
+            n = (node[0] + dir[0], node[1] + dir[1])
+
+            if n in nodes:
+                neighbors.add(n)
+        neighborsDict[node] = neighbors
+        if len(neighbors) > 2:
+            splitPoints.add(node)
+
+    splitPoints.add(start)
+    splitPoints.add(end)
+
+    for sp in splitPoints:
+        dirs = neighborsDict[sp]
+
+        for d in dirs:
+            currentSplit = [sp, d]
+
+            while True:
+                currentNode = currentSplit[-1]
+
+                if currentNode in splitPoints:
+                    break
+
+                neighbors = neighborsDict[currentNode]
+
+                for n in neighbors:
+                    if n not in currentSplit:
+                        currentSplit.append(n)
+
+            splits.append(currentSplit)
+
+    edges = dict()
+
+    for s in splits:
+        edges[(s[0], s[-1])] = len(s) - 1
+
+    return splitPoints, edges
+
+
+LONGEST_DIST = 0
+
+
+def getPaths(
+    nodes: set(),
+    edges: dict,
+    start: tuple,
+    end: tuple,
+    currentNode: tuple,
+    currentPath: list,
+):
+    newPath = currentPath.copy()
+    newPath.append(currentNode)
+
+    if currentNode == end:
+        d = getPathLength(newPath, edges)
+        global LONGEST_DIST
+
+        if d > LONGEST_DIST:
+            # print(d)
+            LONGEST_DIST = d
+
+    neighbors = list()
+    for e in edges:
+        if e[0] == currentNode and e[1] not in newPath:
+            neighbors.append(e[1])
+
+    for n in neighbors:
+        getPaths(nodes, edges, start, end, n, newPath)
+
+
+def getPathLength(path: list, edges: dict):
+    c = 0
+    for x in range(len(path) - 1):
+        n1 = path[x]
+        n2 = path[x + 1]
+
+        d = edges[(n1, n2)]
+
+        c = c + d
+
+    return c
+
+
 def pt1():
     startPos, endPos = getStartAndEndPos(data)
-
-    print(startPos)
-    print(endPos)
 
     d = getMaxDist(data, startPos)
 
@@ -97,7 +188,17 @@ def pt1():
 
 
 def pt2():
-    pass
+    sys.setrecursionlimit(10000)
+
+    startPos, endPos = getStartAndEndPos(data)
+
+    allNodes = getTrailTiles(data)
+
+    nodes, edges = getSplits(allNodes, startPos, endPos)
+
+    getPaths(nodes, edges, startPos, endPos, startPos, [])
+
+    return LONGEST_DIST
 
 
 print("Part 1 Answer:")
@@ -111,3 +212,36 @@ print("Part 2 Answer:")
 print(Fore.GREEN + str(pt2()))
 print(Style.RESET_ALL, end="")
 print(f"It took {time.time() - start_time}s to get answer")
+
+
+test = """#S#####################
+#OOOOOOO#########OOO###
+#######O#########O#O###
+###OOOOO#.>OOO###O#O###
+###O#####.#O#O###O#O###
+###O>...#.#O#OOOOO#OOO#
+###O###.#.#O#########O#
+###OOO#.#.#OOOOOOO#OOO#
+#####O#.#.#######O#O###
+#OOOOO#.#.#OOOOOOO#OOO#
+#O#####.#.#O#########O#
+#O#OOO#...#OOO###...>O#
+#O#O#O#######O###.###O#
+#OOO#O>.#...>O>.#.###O#
+#####O#.#.###O#.#.###O#
+#OOOOO#...#OOO#.#.#OOO#
+#O#########O###.#.#O###
+#OOO###OOO#OOO#...#O###
+###O###O#O###O#####O###
+#OOO#OOO#O#OOO>.#.>O###
+#O###O###O#O###.#.#O###
+#OOOOO###OOO###...#OOO#
+#####################O#"""
+
+x = 0
+for j in test:
+    for k in j:
+        if k == "O":
+            x += 1
+
+print(x)
